@@ -4,7 +4,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { execFileSync } = require("node:child_process");
 
-const ROOT = path.join(__dirname, "..");
+const ROOT = path.join(__dirname, "..", "..");
 const ENV_FILE = path.join(ROOT, ".env.local");
 const ENV_EXAMPLE = path.join(ROOT, ".env.example");
 
@@ -33,12 +33,21 @@ if (!fs.existsSync(dataDir)) {
 
 // 4. Push schema using SQLite config
 console.log("[setup] Applying schema to SQLite...");
+const drizzleKit = path.join(ROOT, "node_modules", "drizzle-kit", "bin.cjs");
+if (!fs.existsSync(drizzleKit)) {
+  console.error("[setup] drizzle-kit is not installed. Run npm install first.");
+  process.exit(1);
+}
 try {
-  execFileSync("npx", ["drizzle-kit", "push", "--config=drizzle-sqlite.config.ts", "--force"], {
-    cwd: ROOT,
-    stdio: "inherit",
-    env: { ...process.env, DB_TYPE: "sqlite", SQLITE_PATH: "data/deskrpg.db" },
-  });
+  execFileSync(
+    process.execPath,
+    [drizzleKit, "push", "--config=drizzle-sqlite.config.ts", "--force"],
+    {
+      cwd: ROOT,
+      stdio: "inherit",
+      env: { ...process.env, DB_TYPE: "sqlite", SQLITE_PATH: "data/deskrpg.db" },
+    },
+  );
 } catch {
   console.error("[setup] Schema push failed. You may need to run manually:");
   console.error("  npx drizzle-kit push --config=drizzle-sqlite.config.ts --force");

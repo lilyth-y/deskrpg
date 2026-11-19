@@ -9,7 +9,7 @@ import { I18nProvider } from "@/lib/i18n";
 import type { AttentionRow } from "@/lib/attention-inbox";
 
 import AttentionInboxPanel from "./AttentionInboxPanel";
-import type { AttentionInbox } from "./attention-api";
+import { AttentionApiError, type AttentionInbox } from "./attention-api";
 
 const EMPTY_COUNTS = { awaiting_approval: 0, blocked: 0, review: 0, total: 0 };
 
@@ -159,6 +159,22 @@ test("a non-approval row has no decision buttons, only an open action", async ()
   );
   assert.deepEqual(opened, ["t1"]);
   assert.deepEqual(cronOpened, ["j1"], "크론 실패는 카드가 아니라 이력으로 간다");
+  await cleanup();
+});
+
+test("a missing gateway is explained instead of the English server sentence", async () => {
+  const client = {
+    async load() {
+      throw new AttentionApiError(409, "gateway_not_bound", "Channel has no gateway bound");
+    },
+    async decide() {
+      return {};
+    },
+  } as never;
+  const { host, cleanup } = await render(<AttentionInboxPanel channelId="c1" api={client} />);
+  const text = host.querySelector("[data-attention-error]")?.textContent ?? "";
+  assert.match(text, /게이트웨이/);
+  assert.equal(text.includes("Channel has no gateway bound"), false);
   await cleanup();
 });
 

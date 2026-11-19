@@ -10,6 +10,7 @@ import {
   decryptGatewayToken,
   getAccessibleGatewayResource,
   getChannelGatewayBinding,
+  normalizeGatewayBaseUrl,
   unbindGatewayFromChannel,
   upsertOwnedGatewayResource,
 } from "@/lib/gateway-resources";
@@ -155,9 +156,18 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     if (!requestedUrl) {
       nextGatewayId = null;
     } else {
+      let baseUrl: string;
+      try {
+        baseUrl = normalizeGatewayBaseUrl(requestedUrl);
+      } catch {
+        return NextResponse.json(
+          { errorCode: "invalid_gateway_url", error: "Invalid gateway URL format" },
+          { status: 400 },
+        );
+      }
       const resource = await upsertOwnedGatewayResource({
         ownerUserId: userId,
-        baseUrl: requestedUrl,
+        baseUrl,
         token: tokenProvided ? (requestedToken ?? "") : undefined,
         displayName: typeof body.displayName === "string" ? body.displayName : undefined,
       });

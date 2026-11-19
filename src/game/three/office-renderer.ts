@@ -194,9 +194,11 @@ export class OfficeRenderer {
   private meetingEntryWalking = false;
   private furnitureHighlight = new FurnitureHighlight();
   private cancelBoardKey = (e: KeyboardEvent) => {
+    const key = e.key?.toLowerCase();
     if (
+      key &&
       ["w", "a", "s", "d", "arrowup", "arrowdown", "arrowleft", "arrowright", "escape"].includes(
-        e.key.toLowerCase(),
+        key,
       )
     )
       this.boardArrival.cancel();

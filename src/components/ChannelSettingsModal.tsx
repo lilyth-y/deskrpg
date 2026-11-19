@@ -300,7 +300,7 @@ export default function ChannelSettingsModal({
             }),
           });
       const data = await res.json();
-      if (res.ok) {
+      if (res.ok && data.ok) {
         setGatewayConnectionState({ status: "connected" });
       } else {
         setGatewayConnectionState({

@@ -91,7 +91,9 @@ app.prepare().then(async () => {
 
   setupSocketHandlers(io);
 
-  httpServer.listen(port, captureMode ? "127.0.0.1" : undefined, () => {
-    console.log(`> Dev server ready on http://${hostname}:${port}`);
+  const listenHost =
+    captureMode || process.env.DESKRPG_LOCAL_AUTOLOGIN === "1" ? "127.0.0.1" : undefined;
+  httpServer.listen(port, listenHost, () => {
+    console.log(`> Dev server ready on http://${listenHost ?? hostname}:${port}`);
   });
 });

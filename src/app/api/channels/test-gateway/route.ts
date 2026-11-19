@@ -36,21 +36,27 @@ export async function POST(req: NextRequest) {
   }
 
   if (typeof url !== "string" || !url.trim()) {
-    return NextResponse.json({
-      ok: false,
-      errorCode: "gateway_url_required",
-      error: "Gateway URL is required",
-    });
+    return NextResponse.json(
+      {
+        ok: false,
+        errorCode: "gateway_url_required",
+        error: "Gateway URL is required",
+      },
+      { status: 400 },
+    );
   }
 
   try {
     new URL(url);
   } catch {
-    return NextResponse.json({
-      ok: false,
-      errorCode: "invalid_gateway_url",
-      error: "Invalid gateway URL format",
-    });
+    return NextResponse.json(
+      {
+        ok: false,
+        errorCode: "invalid_gateway_url",
+        error: "Invalid gateway URL format",
+      },
+      { status: 400 },
+    );
   }
 
   if (isManagedSshUrl(url)) {

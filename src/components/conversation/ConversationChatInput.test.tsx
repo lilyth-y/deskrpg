@@ -6,6 +6,36 @@ import { createRoot } from "react-dom/client";
 import { I18nProvider } from "@/lib/i18n";
 import ConversationChatInput from "./ConversationChatInput";
 
+test("a missing gateway is not shown as an attachment failure", async () => {
+  const original = globalThis.fetch;
+  globalThis.fetch = async () =>
+    new Response(JSON.stringify({ error: "gateway_not_bound", errorCode: "gateway_not_bound" }), {
+      status: 409,
+    });
+  const el = document.createElement("div");
+  const root = createRoot(el);
+  try {
+    await act(async () =>
+      root.render(
+        <I18nProvider initialLocale="en">
+          <ConversationChatInput
+            channelId="c"
+            conversation={{ kind: "room", id: "r" }}
+            onSend={() => {}}
+          />
+        </I18nProvider>,
+      ),
+    );
+    await act(async () => {});
+    const text = el.textContent ?? "";
+    assert.match(text, /Connect a gateway/);
+    assert.equal(text.includes("Failed"), false);
+  } finally {
+    await act(async () => root.unmount());
+    globalThis.fetch = original;
+  }
+});
+
 test("sends selected room history as opaque IDs even without text", async () => {
   const original = globalThis.fetch;
   globalThis.fetch = async (input) =>

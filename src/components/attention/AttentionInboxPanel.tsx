@@ -96,7 +96,9 @@ export default function AttentionInboxPanel({
       setInbox(await client.current.load());
     } catch (e) {
       setInbox(null);
-      setError(e instanceof Error ? e.message : String(e));
+      setError(
+        e instanceof AttentionApiError ? e.code : e instanceof Error ? e.message : String(e),
+      );
     }
   }, []);
 
@@ -143,7 +145,9 @@ export default function AttentionInboxPanel({
   if (error)
     return (
       <div className="p-4 text-body text-text-secondary" data-attention-error>
-        <div className="mb-2 break-words">{error}</div>
+        <div className="mb-2 break-words">
+          {error === "gateway_not_bound" ? t("attention.gatewayNotBound") : error}
+        </div>
         <button
           type="button"
           className="text-caption font-semibold text-primary hover:underline"

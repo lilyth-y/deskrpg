@@ -2993,6 +2993,13 @@ function GamePageInner({ onFatal }: GamePageClientProps) {
         roomState={roomState}
         channelChatOpen={channelChatOpen}
         channelChatInputDisabled={channelChatInputDisabled || !socketConnected}
+        channelChatDisabledPlaceholder={
+          !socketConnected
+            ? t("chat.disconnected")
+            : channelNpcs.length === 0 && channelPlayers.every((player) => player.id === "__self__")
+              ? t("chat.nobodyNearby")
+              : t("chat.moveCloser")
+        }
         onChannelChatVisibleChange={setChannelChatVisible}
         mentionCandidatesFor={mentionCandidatesFor}
         onlinePlayers={channelPlayers.flatMap((player) => {

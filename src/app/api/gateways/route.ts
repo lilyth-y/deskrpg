@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getUserId } from "@/lib/internal-rpc";
 import {
   listAccessibleGatewayResources,
+  normalizeGatewayBaseUrl,
   upsertOwnedGatewayResource,
 } from "@/lib/gateway-resources";
 
@@ -40,9 +41,19 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  let baseUrl: string;
+  try {
+    baseUrl = normalizeGatewayBaseUrl(body.url);
+  } catch {
+    return NextResponse.json(
+      { errorCode: "invalid_gateway_url", error: "Invalid gateway URL format" },
+      { status: 400 },
+    );
+  }
+
   const resource = await upsertOwnedGatewayResource({
     ownerUserId: userId,
-    baseUrl: body.url,
+    baseUrl,
     token: typeof body.token === "string" ? body.token : "",
     displayName: typeof body.displayName === "string" ? body.displayName : undefined,
   });

@@ -86,18 +86,22 @@ export default function ConversationChatInput({
           </div>
         </>
       )}
-      {attachments.error && (
-        <p role="alert" className="px-3 text-xs text-danger">
-          {t(
-            attachments.error === "attachment_feature_unavailable"
-              ? "attachments.unavailable"
-              : attachments.error === "attachment_count_exceeded"
-                ? "attachments.limit"
-                : attachments.error === "attachment_too_large"
+      {attachments.error === "gateway_not_bound" ? (
+        <p className="px-3 text-xs text-text-muted">{t("attachments.gatewayNotBound")}</p>
+      ) : (
+        attachments.error && (
+          <p role="alert" className="px-3 text-xs text-danger">
+            {t(
+              attachments.error === "attachment_feature_unavailable"
+                ? "attachments.unavailable"
+                : attachments.error === "attachment_count_exceeded"
                   ? "attachments.limit"
-                  : "attachments.failed",
-          )}
-        </p>
+                  : attachments.error === "attachment_too_large"
+                    ? "attachments.limit"
+                    : "attachments.failed",
+            )}
+          </p>
+        )
       )}
       {!conversation && props.scope === "meeting" && (
         <p className="px-3 text-xs text-text-muted">{t("attachments.meetingInactive")}</p>

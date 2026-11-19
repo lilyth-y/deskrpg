@@ -114,6 +114,8 @@ interface ChatPanelProps {
   roomState: RoomState;
   channelChatOpen?: boolean;
   channelChatInputDisabled?: boolean;
+  /** Shown in the room composer while input is disabled. Defaults to the proximity hint. */
+  channelChatDisabledPlaceholder?: string;
   /** `skills` is set only when the message carries skill chips (for the one named employee). */
   onRoomSend: (message: string, skills?: string[], attachments?: AttachmentSendPayload) => void;
   onRoomAction: (action: RoomAction) => void;
@@ -227,6 +229,7 @@ export default function ChatPanel({
   roomState,
   channelChatOpen,
   channelChatInputDisabled,
+  channelChatDisabledPlaceholder,
   onRoomSend,
   onRoomAction,
   onRoomCreate,
@@ -1291,7 +1294,7 @@ export default function ChatPanel({
                   : { skillsBlockedReason: "single_mention" as const }
                 : {})}
               placeholder={t("chat.placeholder")}
-              disabledPlaceholder={t("chat.moveCloser")}
+              disabledPlaceholder={channelChatDisabledPlaceholder ?? t("chat.moveCloser")}
               disabled={!!channelChatInputDisabled}
               scope="room"
               mentionCandidates={roomCandidates}

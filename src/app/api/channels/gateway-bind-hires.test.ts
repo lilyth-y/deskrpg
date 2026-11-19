@@ -173,3 +173,18 @@ test("when the connection is unchanged, a PUT that only saves settings does not 
     "사용자가 재운 NPC 는 설정 저장으로 되살아나지 않는다",
   );
 });
+
+test("a gateway address that is not a URL is a 400, not a 500", async () => {
+  const { userId, channelId } = await seedTwoGateways({ profilesEach: 0 });
+  const { PUT } = await import("./[id]/gateway/route");
+  const res = await PUT(
+    new NextRequest(`http://localhost/api/channels/${channelId}/gateway`, {
+      method: "PUT",
+      body: JSON.stringify({ url: "admin" }),
+      headers: authHeaders(userId),
+    }),
+    { params: Promise.resolve({ id: channelId }) },
+  );
+  assert.equal(res.status, 400);
+  assert.equal((await res.json()).errorCode, "invalid_gateway_url");
+});
