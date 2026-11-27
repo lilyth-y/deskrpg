@@ -67,6 +67,12 @@ test("a message isn't lost even when createdAt is empty", () => {
   assert.equal(typeof msg.timestamp, "number");
 });
 
+test("converts a SQLite string timestamp without throwing", () => {
+  const iso = "2026-08-26T01:02:03.000Z";
+  const [msg] = toHistoryMessages([{ role: "npc", content: "안녕", createdAt: iso }]);
+  assert.equal(msg.timestamp, Date.parse(iso));
+});
+
 test("an unknown role is dropped", () => {
   const rows = [
     { role: "player", content: "ok", createdAt: null },

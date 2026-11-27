@@ -7,7 +7,7 @@
 
 import { and, asc, eq } from "drizzle-orm";
 
-import { summarizeDmThreads, type DmThread, type DmThreadRow } from "./dm-threads";
+import { summarizeDmThreads, toTimestampMs, type DmThread, type DmThreadRow } from "./dm-threads";
 
 export type NpcHistoryRole = "player" | "npc";
 
@@ -23,7 +23,7 @@ export type NpcHistoryMessage = {
 export type StoredChatMessage = {
   role: string;
   content: string;
-  createdAt: Date | null;
+  createdAt: Date | string | number | null;
 };
 
 export type NpcChatMessageRow = {
@@ -95,7 +95,7 @@ export function toHistoryMessages(rows: StoredChatMessage[]): NpcHistoryMessage[
       content: row.content,
       // A missing createdAt doesn't drop the message — the order is already decided by the
       // query, and all that's lost here is the display timestamp.
-      timestamp: row.createdAt ? row.createdAt.getTime() : 0,
+      timestamp: toTimestampMs(row.createdAt),
     });
   }
   return messages;

@@ -11,8 +11,19 @@ export type DmThreadRow = {
   npcId: string;
   role: string;
   content: string;
-  createdAt: Date | null;
+  createdAt: Date | string | number | null;
 };
+
+export function toTimestampMs(value: Date | string | number | null | undefined): number {
+  if (value == null) return 0;
+  if (value instanceof Date) {
+    const ms = value.getTime();
+    return Number.isNaN(ms) ? 0 : ms;
+  }
+  if (typeof value === "number") return Number.isFinite(value) ? value : 0;
+  const ms = Date.parse(value);
+  return Number.isNaN(ms) ? 0 : ms;
+}
 
 export type DmThread = {
   npcId: string;
@@ -38,7 +49,7 @@ export function summarizeDmThreads(rows: DmThreadRow[]): DmThread[] {
     if (row.role !== "player" && row.role !== "npc") continue;
     const content = row.content.trim();
     if (!content) continue;
-    const at = row.createdAt ? row.createdAt.getTime() : 0;
+    const at = toTimestampMs(row.createdAt);
     const current = byNpc.get(row.npcId);
     // At the same timestamp, the row read later wins — since the query is ascending, that's the last message.
     if (current && current.lastAt > at) continue;

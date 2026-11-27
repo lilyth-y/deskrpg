@@ -53,6 +53,15 @@ test("a row with no timestamp is not dropped", () => {
   assert.equal(threads[0].lastAt, 0);
 });
 
+test("SQLite string timestamps are parsed without throwing", () => {
+  const iso = "2026-09-01T00:00:10.000Z";
+  const threads = summarizeDmThreads([
+    { npcId: "n1", role: "npc", content: "반가워요", createdAt: iso },
+  ]);
+  assert.equal(threads.length, 1);
+  assert.equal(threads[0].lastAt, Date.parse(iso));
+});
+
 test("a clocked-out employee's conversation stays as inactive — hiding it would remove the entry point again", () => {
   const entries = buildDmThreadEntries(
     summarizeDmThreads([
